@@ -11,22 +11,32 @@ import { HabitsScreen } from './src/features/habits/components/HabitsScreen';
 import { HealthScreen } from './src/features/health/components/HealthScreen';
 import { BottomTabBar } from './src/shared/components/BottomTabBar';
 import { AddTaskModal } from './src/shared/components/AddTaskModal';
+import { AddTodoModal } from './src/features/inbox/components/AddTodoModal';
 import { NewHabitSheet } from './src/features/habits/components/NewHabitSheet';
 import { HealthInputModal } from './src/features/health/components/HealthInputModal';
 import { HabitsService } from './src/features/habits/services/habitsService';
+import { InboxController } from './src/features/inbox/controllers/InboxController';
 
 export default function App() {
   const { theme } = useTheme(true);
   const [activeTab, setActiveTab] = useState<TabType>('timeline');
   const [isAddTaskModalVisible, setIsAddTaskModalVisible] = useState(false);
+  const [isAddTodoModalVisible, setIsAddTodoModalVisible] = useState(false);
   const [isAddHabitModalVisible, setIsAddHabitModalVisible] = useState(false);
   const [isAddHealthModalVisible, setIsAddHealthModalVisible] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const [inboxController] = useState(() => new InboxController());
 
   const handleAddTask = (taskData: any) => {
     console.log('Adding task:', taskData);
     // TODO: Implement task creation logic
     setIsAddTaskModalVisible(false);
+  };
+
+  const handleAddTodo = (todoData: any) => {
+    console.log('Adding todo:', todoData);
+    inboxController.addTask(todoData);
+    setIsAddTodoModalVisible(false);
   };
 
   const handleAddHabit = () => {
@@ -53,7 +63,7 @@ export default function App() {
   const renderActiveScreen = () => {
     switch (activeTab) {
       case 'inbox':
-        return <InboxScreen onAddTask={() => setIsAddTaskModalVisible(true)} />;
+        return <InboxScreen />;
       case 'timeline':
         return <TimelineScreen onDateChange={setSelectedDate} />;
       case 'ideal-week':
@@ -79,7 +89,13 @@ export default function App() {
         theme={theme}
         activeTab={activeTab}
         onTabPress={setActiveTab}
-        onAddTask={() => setIsAddTaskModalVisible(true)}
+        onAddTask={() => {
+          if (activeTab === 'inbox') {
+            setIsAddTodoModalVisible(true);
+          } else {
+            setIsAddTaskModalVisible(true);
+          }
+        }}
         onAddHabit={handleAddHabit}
         onAddHealthItem={handleAddHealthItem}
       />
@@ -90,6 +106,13 @@ export default function App() {
         selectedDate={selectedDate}
         onClose={() => setIsAddTaskModalVisible(false)}
         onSave={handleAddTask}
+      />
+
+      <AddTodoModal
+        theme={theme}
+        visible={isAddTodoModalVisible}
+        onClose={() => setIsAddTodoModalVisible(false)}
+        onSave={handleAddTodo}
       />
 
       <NewHabitSheet

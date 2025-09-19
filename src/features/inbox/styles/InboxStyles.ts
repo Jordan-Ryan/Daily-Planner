@@ -56,14 +56,41 @@ export const InboxStyles = (theme: Theme) => StyleSheet.create({
   taskDetails: {
     flex: 1,
   },
+  taskHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
   taskTitle: {
     fontSize: 16,
     fontWeight: '600',
-    marginBottom: 4,
+    flex: 1,
   },
   taskDescription: {
     fontSize: 14,
     fontWeight: '400',
+    marginBottom: 8,
+  },
+  taskMeta: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  metaText: {
+    fontSize: 12,
+    fontWeight: '500',
+  },
+  priorityBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+    marginLeft: 8,
+  },
+  priorityText: {
+    fontSize: 10,
+    fontWeight: '700',
+    color: '#FFFFFF',
   },
   completedTask: {
     textDecorationLine: 'line-through',

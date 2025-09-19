@@ -59,6 +59,11 @@ export const GlassEffect: React.FC<GlassEffectProps> = ({
             borderWidth,
             borderColor: getBorderColor(),
             backgroundColor: getTintColor(),
+            // Enhanced shadow for iPhone glass effect
+            shadowColor: '#000000',
+            shadowOffset: { width: 0, height: 8 },
+            shadowOpacity: 0.15,
+            shadowRadius: 16,
           },
           style,
         ]}
@@ -80,10 +85,10 @@ export const GlassEffect: React.FC<GlassEffectProps> = ({
           backgroundColor: getTintColor(),
           // Enhanced shadow for Android to simulate glass depth
           shadowColor: theme.colors.shadow,
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.15,
-          shadowRadius: 8,
-          elevation: 8,
+          shadowOffset: { width: 0, height: 8 },
+          shadowOpacity: 0.2,
+          shadowRadius: 16,
+          elevation: 16,
         },
         style,
       ]}

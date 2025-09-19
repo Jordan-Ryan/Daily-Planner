@@ -6,15 +6,17 @@ import { TimeRail } from './TimeRail';
 import { TaskCard } from './TaskCard';
 import { TaskModal } from './TaskModal';
 import { IdealWeekService } from '../services/idealWeekService';
+import { SettingsService } from '../../../shared/services/settingsService';
 
 interface TimelineAreaProps {
   theme: Theme;
   tasks: Task[];
+  selectedDay: number; // 0 = Sunday, 1 = Monday, etc.
   onToggleComplete: (taskId: string) => void;
   onTasksChange: (tasks: Task[]) => void;
 }
 
-export const TimelineArea: React.FC<TimelineAreaProps> = ({ theme, tasks, onToggleComplete, onTasksChange }) => {
+export const TimelineArea: React.FC<TimelineAreaProps> = ({ theme, tasks, selectedDay, onToggleComplete, onTasksChange }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
 
@@ -52,14 +54,14 @@ export const TimelineArea: React.FC<TimelineAreaProps> = ({ theme, tasks, onTogg
   // For ideal week, we only show timed tasks (no all-day events)
   const timedTasks = tasks.filter(task => !task.isAllDay);
 
-  // Generate dynamic time slots based on wake/sleep times (same as normal timeline)
+  // Generate dynamic time slots based on settings for the selected day
   const generateTimeSlots = () => {
-    const wakeUpTask = timedTasks.find(task => task.isSystemTask && task.title === 'Wake up');
-    const sleepTask = timedTasks.find(task => task.isSystemTask && task.title === 'Sleep well');
+    const settingsService = SettingsService.getInstance();
+    const dayName = SettingsService.getDayNameFromIndex(selectedDay);
+    const daySchedule = settingsService.getDaySchedule(dayName);
     
-    // If no wake/sleep tasks found, show full day (00:00 to 23:30)
-    const wakeTime = wakeUpTask?.startTime || '06:00';
-    const sleepTime = sleepTask?.startTime || '22:00';
+    const wakeTime = daySchedule.wakeUpTime;
+    const sleepTime = daySchedule.sleepTime;
     
     const slots = [];
     const wakeHour = parseInt(wakeTime.split(':')[0]);
@@ -112,7 +114,7 @@ export const TimelineArea: React.FC<TimelineAreaProps> = ({ theme, tasks, onTogg
         contentContainerStyle={styles.scrollContentContainer}
       >
         <View style={styles.scrollableTimeline}>
-          <TimeRail theme={theme} tasks={timedTasks} />
+          <TimeRail theme={theme} selectedDay={selectedDay} />
           <View style={styles.tasksContainer}>
             <View style={styles.tasksContent}>
               {renderContinuousTimeline()}

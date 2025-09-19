@@ -59,6 +59,7 @@ export const TimelineScreen: React.FC<TimelineScreenProps> = ({ onDateChange }) 
         <TimelineArea 
           theme={theme} 
           tasks={tasks} 
+          selectedDate={selectedDate}
           onToggleComplete={actions.toggleTaskComplete}
           onTasksChange={actions.setTasks}
         />

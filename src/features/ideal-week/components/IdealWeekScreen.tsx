@@ -44,6 +44,7 @@ export const IdealWeekScreen: React.FC<IdealWeekScreenProps> = ({ onDateChange }
         <TimelineArea 
           theme={theme} 
           tasks={tasks} 
+          selectedDay={selectedDay}
           onToggleComplete={actions.toggleTaskComplete}
           onTasksChange={actions.setTasks}
         />

@@ -3,11 +3,7 @@ import { useTheme } from '../../../shared/hooks/useTheme';
 import { useInbox } from '../hooks/useInbox';
 import { InboxView } from '../views/InboxView';
 
-interface InboxScreenProps {
-  onAddTask: () => void;
-}
-
-export const InboxScreen: React.FC<InboxScreenProps> = ({ onAddTask }) => {
+export const InboxScreen: React.FC = () => {
   const { theme } = useTheme(true);
   const { inboxTasks, incompleteTasks, completedTasks, actions } = useInbox();
 

@@ -51,4 +51,13 @@ export const SettingsStyles = (theme: Theme) => StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  dayScheduleContainer: {
+    marginBottom: 16,
+  },
+  dayLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+    marginLeft: 4,
+  },
 });

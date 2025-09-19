@@ -1,23 +1,15 @@
-import { Task } from '../../timeline/types';
-
-export interface InboxControllerActions {
-  toggleTaskComplete: (taskId: string) => void;
-  addTask: (task: Omit<Task, 'id'>) => void;
-  updateTask: (taskId: string, updates: Partial<Task>) => void;
-  deleteTask: (taskId: string) => void;
-  loadInboxTasks: () => void;
-}
+import { TodoTask, InboxActions } from '../types';
 
 export class InboxController {
-  private inboxTasks: Task[] = [];
-  private listeners: ((tasks: Task[]) => void)[] = [];
+  private inboxTasks: TodoTask[] = [];
+  private listeners: ((tasks: TodoTask[]) => void)[] = [];
 
   constructor() {
     this.loadInboxTasks();
   }
 
   // Subscribe to task changes
-  subscribe(listener: (tasks: Task[]) => void): () => void {
+  subscribe(listener: (tasks: TodoTask[]) => void): () => void {
     this.listeners.push(listener);
     // Return unsubscribe function
     return () => {
@@ -34,17 +26,17 @@ export class InboxController {
   }
 
   // Get current tasks
-  getTasks(): Task[] {
+  getTasks(): TodoTask[] {
     return [...this.inboxTasks];
   }
 
   // Get incomplete tasks
-  getIncompleteTasks(): Task[] {
+  getIncompleteTasks(): TodoTask[] {
     return this.inboxTasks.filter(task => !task.complete);
   }
 
   // Get completed tasks
-  getCompletedTasks(): Task[] {
+  getCompletedTasks(): TodoTask[] {
     return this.inboxTasks.filter(task => task.complete);
   }
 
@@ -54,29 +46,34 @@ export class InboxController {
     if (taskIndex !== -1) {
       this.inboxTasks[taskIndex] = {
         ...this.inboxTasks[taskIndex],
-        complete: !this.inboxTasks[taskIndex].complete
+        complete: !this.inboxTasks[taskIndex].complete,
+        updatedAt: new Date().toISOString()
       };
       this.notifyListeners();
     }
   }
 
   // Add new task
-  addTask(task: Omit<Task, 'id'>): void {
-    const newTask: Task = {
+  addTask(task: Omit<TodoTask, 'id' | 'createdAt' | 'updatedAt'>): void {
+    const now = new Date().toISOString();
+    const newTask: TodoTask = {
       ...task,
-      id: `inbox-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+      id: `inbox-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      createdAt: now,
+      updatedAt: now
     };
     this.inboxTasks.push(newTask);
     this.notifyListeners();
   }
 
   // Update existing task
-  updateTask(taskId: string, updates: Partial<Task>): void {
+  updateTask(taskId: string, updates: Partial<TodoTask>): void {
     const taskIndex = this.inboxTasks.findIndex(task => task.id === taskId);
     if (taskIndex !== -1) {
       this.inboxTasks[taskIndex] = {
         ...this.inboxTasks[taskIndex],
-        ...updates
+        ...updates,
+        updatedAt: new Date().toISOString()
       };
       this.notifyListeners();
     }
@@ -88,55 +85,15 @@ export class InboxController {
     this.notifyListeners();
   }
 
-  // Load sample inbox tasks
+  // Load inbox tasks
   private loadInboxTasks(): void {
-    const sampleTasks: Task[] = [
-      {
-        id: 'inbox-1',
-        icon: '🛒',
-        title: 'Buy groceries',
-        startDate: '',
-        startTime: '',
-        endDate: '',
-        endTime: '',
-        calendar: 'Personal',
-        description: 'Milk, bread, eggs, vegetables',
-        complete: false,
-        isAllDay: false,
-      },
-      {
-        id: 'inbox-2',
-        icon: '📚',
-        title: 'Read new book',
-        startDate: '',
-        startTime: '',
-        endDate: '',
-        endTime: '',
-        calendar: 'Personal',
-        description: 'Finish reading "Atomic Habits"',
-        complete: false,
-        isAllDay: false,
-      },
-      {
-        id: 'inbox-3',
-        icon: '🏃',
-        title: 'Plan workout routine',
-        startDate: '',
-        startTime: '',
-        endDate: '',
-        endTime: '',
-        calendar: 'Personal',
-        description: 'Create weekly exercise schedule',
-        complete: true,
-        isAllDay: false,
-      },
-    ];
-    this.inboxTasks = sampleTasks;
+    // Start with empty inbox
+    this.inboxTasks = [];
     this.notifyListeners();
   }
 
   // Get actions object for components
-  getActions(): InboxControllerActions {
+  getActions(): InboxActions {
     return {
       toggleTaskComplete: this.toggleTaskComplete.bind(this),
       addTask: this.addTask.bind(this),

@@ -32,7 +32,9 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
   const getTabStyle = (tab: TabType) => [
     styles.tab,
     activeTab === tab && { 
-      backgroundColor: 'rgba(255, 255, 255, 0.15)',
+      backgroundColor: theme.colors.background === '#FFFFFF' 
+        ? 'rgba(0, 0, 0, 0.1)' 
+        : 'rgba(255, 255, 255, 0.15)',
     }
   ];
 
@@ -60,45 +62,42 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
 
 
   return (
-    <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <GlassEffect
-        theme={theme}
-        intensity="medium"
-        borderRadius={20}
-        style={styles.tabGroup}
-      >
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.scrollContent}
-        >
-          {tabs.map((tab) => (
-            <TouchableOpacity
-              key={tab.id}
-              style={getTabStyle(tab.id)}
-              onPress={() => onTabPress(tab.id)}
-            >
-              <Text style={styles.tabIcon}>{tab.icon}</Text>
-              <Text style={getTabTextStyle(tab.id)}>{tab.label}</Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </GlassEffect>
-
-      <View style={styles.addButtonContainer}>
+    <View style={styles.container}>
+      <View style={styles.navigationWrapper}>
         <GlassEffect
           theme={theme}
           intensity="heavy"
-          borderRadius={28}
-          style={styles.addButton}
+          borderRadius={25}
+          style={styles.glassContainer}
         >
-          <TouchableOpacity
-            style={styles.addButtonTouchable}
-            onPress={handleAddButtonPress}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.scrollContent}
           >
-            <Text style={styles.addButtonIcon}>+</Text>
-          </TouchableOpacity>
+            {tabs.map((tab) => (
+              <TouchableOpacity
+                key={tab.id}
+                style={getTabStyle(tab.id)}
+                onPress={() => onTabPress(tab.id)}
+              >
+                <Text style={styles.tabIcon}>{tab.icon}</Text>
+                <Text style={getTabTextStyle(tab.id)}>{tab.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
         </GlassEffect>
+
+        {activeTab !== 'settings' && (
+          <View style={styles.addButtonContainer}>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={handleAddButtonPress}
+            >
+              <Text style={styles.addButtonIcon}>+</Text>
+            </TouchableOpacity>
+          </View>
+        )}
       </View>
     </View>
   );
@@ -106,24 +105,36 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'flex-end',
-    paddingVertical: 16,
+    paddingVertical: 20,
     paddingHorizontal: 20,
-    paddingBottom: 24,
-    position: 'relative',
+    paddingBottom: 34, // iPhone safe area bottom padding
+    alignItems: 'center',
   },
-  tabGroup: {
+  navigationWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    maxWidth: 400, // Limit width to center the navigation
+  },
+  glassContainer: {
     flex: 1,
     paddingVertical: 8,
     paddingHorizontal: 12,
-    marginRight: 80, // Add space for the plus button
-    overflow: 'hidden', // Ensure content doesn't overflow the rounded container
+    marginRight: 12, // Space between nav and + button
+    overflow: 'hidden',
+    // Enhanced glass effect
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 16,
   },
   scrollContent: {
     flexDirection: 'row',
-    paddingHorizontal: 0,
+    paddingHorizontal: 4,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   tab: {
     alignItems: 'center',
@@ -132,7 +143,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginHorizontal: 2,
     minHeight: 48,
-    minWidth: 60,
+    minWidth: 56,
     justifyContent: 'center',
   },
   tabIcon: {
@@ -141,28 +152,30 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: 10,
+    fontWeight: '500',
   },
   addButtonContainer: {
-    position: 'absolute',
-    right: 20,
-    bottom: 32,
+    // Positioned next to the navigation bar, not overlapping
   },
   addButton: {
-    width: 56,
-    height: 56,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#1C1C1E', // Dark background like in the image
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  addButtonTouchable: {
-    width: '100%',
-    height: '100%',
-    justifyContent: 'center',
-    alignItems: 'center',
+    // Enhanced shadow for floating effect
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   addButtonIcon: {
     fontSize: 24,
-    color: '#000000',
-    fontWeight: 'bold',
+    fontWeight: '300',
+    color: '#FFFFFF',
     textAlign: 'center',
+    lineHeight: 24,
   },
 });

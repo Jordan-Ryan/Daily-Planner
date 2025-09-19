@@ -3,8 +3,15 @@ import { SettingsController, SettingsData } from '../controllers/SettingsControl
 
 export const useSettings = () => {
   const [settings, setSettings] = useState<SettingsData>({
-    wakeUpTime: '05:30',
-    sleepTime: '22:00',
+    dailySchedule: {
+      monday: { wakeUpTime: '06:00', sleepTime: '22:00' },
+      tuesday: { wakeUpTime: '06:00', sleepTime: '22:00' },
+      wednesday: { wakeUpTime: '06:00', sleepTime: '22:00' },
+      thursday: { wakeUpTime: '06:00', sleepTime: '22:00' },
+      friday: { wakeUpTime: '06:00', sleepTime: '22:00' },
+      saturday: { wakeUpTime: '07:00', sleepTime: '23:00' },
+      sunday: { wakeUpTime: '07:00', sleepTime: '23:00' },
+    },
     darkMode: true,
     notifications: true,
   });

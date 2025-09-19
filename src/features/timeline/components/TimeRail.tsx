@@ -1,22 +1,22 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Theme } from '../../../shared/types';
-import { Task } from '../types';
+import { SettingsService } from '../../../shared/services/settingsService';
 
 interface TimeRailProps {
   theme: Theme;
-  tasks: Task[];
+  selectedDate: Date;
 }
 
-export const TimeRail: React.FC<TimeRailProps> = ({ theme, tasks }) => {
-  // Generate dynamic time slots based on wake/sleep times
+export const TimeRail: React.FC<TimeRailProps> = ({ theme, selectedDate }) => {
+  // Generate dynamic time slots based on settings for the selected date
   const generateTimeSlots = () => {
-    const wakeUpTask = tasks.find(task => task.isSystemTask && task.title === 'Wake up!');
-    const sleepTask = tasks.find(task => task.isSystemTask && task.title === 'Sleep well');
+    const settingsService = SettingsService.getInstance();
+    const dayName = SettingsService.getDayNameFromDate(selectedDate);
+    const daySchedule = settingsService.getDaySchedule(dayName);
     
-    // If no wake/sleep tasks found, show full day (00:00 to 23:30)
-    const wakeTime = wakeUpTask?.startTime || '00:00';
-    const sleepTime = sleepTask?.startTime || '23:30';
+    const wakeTime = daySchedule.wakeUpTime;
+    const sleepTime = daySchedule.sleepTime;
     
     const slots = [];
     const wakeHour = parseInt(wakeTime.split(':')[0]);

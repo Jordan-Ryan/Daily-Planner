@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Task } from '../../timeline/types';
+import { TodoTask } from '../types';
 import { InboxController } from '../controllers/InboxController';
 
 export const useInbox = () => {
-  const [inboxTasks, setInboxTasks] = useState<Task[]>([]);
+  const [inboxTasks, setInboxTasks] = useState<TodoTask[]>([]);
   const [controller] = useState(() => new InboxController());
 
   useEffect(() => {

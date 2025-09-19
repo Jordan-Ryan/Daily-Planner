@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Switch, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Theme } from '../../../shared/types';
 import { SettingsData, SettingsControllerActions } from '../controllers/SettingsController';
 import { SettingsStyles } from '../styles/SettingsStyles';
+import { ScheduleScreen } from '../components/ScheduleScreen';
 
 interface SettingsViewProps {
   theme: Theme;
@@ -13,6 +14,17 @@ interface SettingsViewProps {
 
 export const SettingsView: React.FC<SettingsViewProps> = ({ theme, settings, actions }) => {
   const styles = SettingsStyles(theme);
+  const [showScheduleScreen, setShowScheduleScreen] = useState(false);
+
+  if (showScheduleScreen) {
+    return (
+      <ScheduleScreen
+        theme={theme}
+        actions={actions}
+        onBack={() => setShowScheduleScreen(false)}
+      />
+    );
+  }
 
   const SettingItem = ({ 
     title, 
@@ -63,21 +75,9 @@ export const SettingsView: React.FC<SettingsViewProps> = ({ theme, settings, act
           </Text>
           
           <SettingItem
-            title="Wake Up Time"
-            subtitle={settings.wakeUpTime}
-            onPress={() => {
-              // TODO: Open time picker
-              console.log('Open wake up time picker');
-            }}
-          />
-          
-          <SettingItem
-            title="Sleep Time"
-            subtitle={settings.sleepTime}
-            onPress={() => {
-              // TODO: Open time picker
-              console.log('Open sleep time picker');
-            }}
+            title="Daily Schedule"
+            subtitle="Set wake up and bed times"
+            onPress={() => setShowScheduleScreen(true)}
           />
         </View>
 

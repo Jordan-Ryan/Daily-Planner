@@ -1,13 +1,28 @@
-export interface SettingsData {
+export interface DaySchedule {
   wakeUpTime: string;
   sleepTime: string;
+}
+
+export interface SettingsData {
+  // Per-day schedule settings
+  dailySchedule: {
+    monday: DaySchedule;
+    tuesday: DaySchedule;
+    wednesday: DaySchedule;
+    thursday: DaySchedule;
+    friday: DaySchedule;
+    saturday: DaySchedule;
+    sunday: DaySchedule;
+  };
+  // Global settings
   darkMode: boolean;
   notifications: boolean;
 }
 
 export interface SettingsControllerActions {
-  setWakeUpTime: (time: string) => void;
-  setSleepTime: (time: string) => void;
+  setDaySchedule: (day: keyof SettingsData['dailySchedule'], schedule: DaySchedule) => void;
+  setWakeUpTime: (day: keyof SettingsData['dailySchedule'], time: string) => void;
+  setSleepTime: (day: keyof SettingsData['dailySchedule'], time: string) => void;
   setDarkMode: (enabled: boolean) => void;
   setNotifications: (enabled: boolean) => void;
   resetSettings: () => void;
@@ -15,8 +30,15 @@ export interface SettingsControllerActions {
 
 export class SettingsController {
   private settings: SettingsData = {
-    wakeUpTime: '05:30',
-    sleepTime: '22:00',
+    dailySchedule: {
+      monday: { wakeUpTime: '06:00', sleepTime: '22:00' },
+      tuesday: { wakeUpTime: '06:00', sleepTime: '22:00' },
+      wednesday: { wakeUpTime: '06:00', sleepTime: '22:00' },
+      thursday: { wakeUpTime: '06:00', sleepTime: '22:00' },
+      friday: { wakeUpTime: '06:00', sleepTime: '22:00' },
+      saturday: { wakeUpTime: '07:00', sleepTime: '23:00' },
+      sunday: { wakeUpTime: '07:00', sleepTime: '23:00' },
+    },
     darkMode: true,
     notifications: true,
   };
@@ -45,15 +67,21 @@ export class SettingsController {
     return { ...this.settings };
   }
 
-  // Set wake up time
-  setWakeUpTime(time: string): void {
-    this.settings.wakeUpTime = time;
+  // Set day schedule
+  setDaySchedule(day: keyof SettingsData['dailySchedule'], schedule: DaySchedule): void {
+    this.settings.dailySchedule[day] = schedule;
     this.notifyListeners();
   }
 
-  // Set sleep time
-  setSleepTime(time: string): void {
-    this.settings.sleepTime = time;
+  // Set wake up time for specific day
+  setWakeUpTime(day: keyof SettingsData['dailySchedule'], time: string): void {
+    this.settings.dailySchedule[day].wakeUpTime = time;
+    this.notifyListeners();
+  }
+
+  // Set sleep time for specific day
+  setSleepTime(day: keyof SettingsData['dailySchedule'], time: string): void {
+    this.settings.dailySchedule[day].sleepTime = time;
     this.notifyListeners();
   }
 
@@ -72,8 +100,15 @@ export class SettingsController {
   // Reset to default settings
   resetSettings(): void {
     this.settings = {
-      wakeUpTime: '05:30',
-      sleepTime: '22:00',
+      dailySchedule: {
+        monday: { wakeUpTime: '06:00', sleepTime: '22:00' },
+        tuesday: { wakeUpTime: '06:00', sleepTime: '22:00' },
+        wednesday: { wakeUpTime: '06:00', sleepTime: '22:00' },
+        thursday: { wakeUpTime: '06:00', sleepTime: '22:00' },
+        friday: { wakeUpTime: '06:00', sleepTime: '22:00' },
+        saturday: { wakeUpTime: '07:00', sleepTime: '23:00' },
+        sunday: { wakeUpTime: '07:00', sleepTime: '23:00' },
+      },
       darkMode: true,
       notifications: true,
     };
@@ -83,6 +118,7 @@ export class SettingsController {
   // Get actions object for components
   getActions(): SettingsControllerActions {
     return {
+      setDaySchedule: this.setDaySchedule.bind(this),
       setWakeUpTime: this.setWakeUpTime.bind(this),
       setSleepTime: this.setSleepTime.bind(this),
       setDarkMode: this.setDarkMode.bind(this),
