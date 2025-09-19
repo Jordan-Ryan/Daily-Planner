@@ -41,3 +41,4 @@ export interface HealthMetricConfig {
   color: string;
   category: 'nutrition' | 'fitness' | 'wellness';
 }
+

@@ -10,6 +10,7 @@ import { Theme } from '../types';
 import { MetricCardProps } from '../types/habits';
 import { StreakBadge } from './StreakBadge';
 import { ProgressRing } from './ProgressRing';
+import { GlassEffect } from './GlassEffect';
 
 export const MetricCard: React.FC<MetricCardProps> = ({
   title,
@@ -91,17 +92,18 @@ export const MetricCard: React.FC<MetricCardProps> = ({
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnimation }] }}>
       <TouchableOpacity
-        style={[
-          styles.container,
-          { 
-            backgroundColor: theme.colors.surface,
-            borderColor: isDueToday ? color : theme.colors.border,
-            borderWidth: isDueToday ? 2 : 1,
-          }
-        ]}
         onPress={handlePress}
         activeOpacity={0.7}
+        style={styles.touchableContainer}
       >
+        <GlassEffect
+          theme={theme}
+          intensity="light"
+          borderRadius={12}
+          borderWidth={isDueToday ? 2 : 1}
+          borderColor={isDueToday ? color : theme.colors.glass.border}
+          style={styles.container}
+        >
         <View style={styles.content}>
           <View style={styles.leftSection}>
             <View style={[styles.iconContainer, { borderColor: color }]}>
@@ -177,25 +179,19 @@ export const MetricCard: React.FC<MetricCardProps> = ({
             )}
           </View>
         )}
+        </GlassEffect>
       </TouchableOpacity>
     </Animated.View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  touchableContainer: {
     marginHorizontal: 20,
     marginVertical: 6,
-    borderRadius: 12,
+  },
+  container: {
     padding: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   content: {
     flexDirection: 'row',
@@ -253,3 +249,4 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
 });
+

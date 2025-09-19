@@ -5,8 +5,10 @@ import { Task } from '../types';
 import { TimeRail } from './TimeRail';
 import { TaskCard } from './TaskCard';
 import { AllDayTaskCard } from './AllDayTaskCard';
+import { DirectOverlapCard } from './DirectOverlapCard';
 import { TaskModal } from './TaskModal';
 import { TimelineService } from '../services/timelineService';
+import { groupOverlappingEvents } from '../services/timelineUtils';
 
 interface TimelineAreaProps {
   theme: Theme;
@@ -91,6 +93,61 @@ export const TimelineArea: React.FC<TimelineAreaProps> = ({ theme, tasks, onTogg
   const allDayTasks = tasks.filter(task => task.isAllDay);
   const timedTasks = tasks.filter(task => !task.isAllDay);
   
+  // Group all overlapping events (both direct and regular overlaps)
+  const directOverlapGroups = new Map<string, Task[]>();
+  const regularTasks: Task[] = [];
+  
+  // Handle direct overlaps first
+  timedTasks.forEach(task => {
+    if (task.isDirectOverlap && task.overlapGroup) {
+      if (!directOverlapGroups.has(task.overlapGroup)) {
+        directOverlapGroups.set(task.overlapGroup, []);
+      }
+      directOverlapGroups.get(task.overlapGroup)!.push(task);
+    }
+  });
+  
+  // Get tasks that are NOT in direct overlap groups
+  const directOverlapTaskIds = new Set<string>();
+  directOverlapGroups.forEach(group => {
+    group.forEach(task => directOverlapTaskIds.add(task.id));
+  });
+  
+  // Only process regular overlaps for tasks that are NOT in direct overlap groups
+  const tasksForRegularOverlap = timedTasks.filter(task => !directOverlapTaskIds.has(task.id));
+  const regularOverlapGroups = groupOverlappingEvents(tasksForRegularOverlap);
+  
+  // Find tasks that are not in any overlap group
+  const allGroupedTaskIds = new Set<string>();
+  directOverlapGroups.forEach(group => {
+    group.forEach(task => allGroupedTaskIds.add(task.id));
+  });
+  regularOverlapGroups.forEach(group => {
+    group.forEach(task => allGroupedTaskIds.add(task.id));
+  });
+  
+  // Only include tasks that are NOT in any overlap group
+  timedTasks.forEach(task => {
+    if (!allGroupedTaskIds.has(task.id)) {
+      regularTasks.push(task);
+    }
+  });
+  
+  // Debug logging
+  console.log('Direct overlap groups:', Array.from(directOverlapGroups.keys()));
+  console.log('Regular overlap groups:', Array.from(regularOverlapGroups.keys()));
+  console.log('Grouped task IDs:', Array.from(allGroupedTaskIds));
+  console.log('Regular tasks count:', regularTasks.length);
+  console.log('Regular tasks:', regularTasks.map(t => t.title));
+  
+  // Debug the overlap groups
+  directOverlapGroups.forEach((tasks, key) => {
+    console.log(`Direct group ${key}:`, tasks.map(t => `${t.id}-${t.title}`));
+  });
+  regularOverlapGroups.forEach((tasks, key) => {
+    console.log(`Regular group ${key}:`, tasks.map(t => `${t.id}-${t.title}`));
+  });
+  
   // Get all occupied time slots (only for timed tasks)
   const occupiedSlots = new Set(timedTasks.map(task => task.startTime));
   
@@ -135,12 +192,32 @@ export const TimelineArea: React.FC<TimelineAreaProps> = ({ theme, tasks, onTogg
           <View style={styles.tasksContainer}>
             <View style={styles.tasksContent}>
               {renderContinuousTimeline()}
-              {timedTasks.map((task) => (
+              {regularTasks.map((task) => (
                 <TaskCard 
                   key={task.id} 
                   task={task} 
                   theme={theme} 
-                  tasks={timedTasks} 
+                  tasks={regularTasks} 
+                  onToggleComplete={onToggleComplete}
+                  onEditTask={handleEditTask}
+                />
+              ))}
+              {Array.from(directOverlapGroups.entries()).map(([groupKey, groupTasks]) => (
+                <DirectOverlapCard
+                  key={`direct-${groupKey}`}
+                  tasks={groupTasks}
+                  allTasks={timedTasks}
+                  theme={theme}
+                  onToggleComplete={onToggleComplete}
+                  onEditTask={handleEditTask}
+                />
+              ))}
+              {Array.from(regularOverlapGroups.entries()).map(([groupKey, groupTasks]) => (
+                <DirectOverlapCard
+                  key={`regular-${groupKey}`}
+                  tasks={groupTasks}
+                  allTasks={timedTasks}
+                  theme={theme}
                   onToggleComplete={onToggleComplete}
                   onEditTask={handleEditTask}
                 />

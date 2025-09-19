@@ -40,11 +40,12 @@ export const TimelineScreen: React.FC<TimelineScreenProps> = ({ onDateChange }) 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <StatusBar style="light" translucent={false} />
-      <View style={[styles.content, { paddingTop: Platform.OS === 'ios' ? 44 : 20 }]}>
+      <View style={[styles.content, { paddingTop: 0 }]}>
         <Header 
           theme={theme} 
           selectedDate={selectedDate}
           onCalendarPress={handleCalendarPress}
+          noTopPadding={true}
         />
         
         <DateStrip

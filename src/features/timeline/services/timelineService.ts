@@ -1,10 +1,12 @@
 import { Task } from '../types';
 import { TaskModel } from '../models/TaskModel';
+import { detectOverlappingEvents } from './timelineUtils';
 
 // Service layer - handles business logic and coordinates with data models
 export class TimelineService {
   static async getTasks(date?: string): Promise<Task[]> {
-    return TaskModel.getAllTasks(date);
+    const tasks = await TaskModel.getAllTasks(date);
+    return detectOverlappingEvents(tasks);
   }
 
   static async getTaskById(id: string): Promise<Task | undefined> {
@@ -24,7 +26,8 @@ export class TimelineService {
   }
 
   static async getTasksByDate(date: string): Promise<Task[]> {
-    return TaskModel.getTasksByDate(date);
+    const tasks = await TaskModel.getTasksByDate(date);
+    return detectOverlappingEvents(tasks);
   }
 
   static async getTasksByCalendar(calendar: string): Promise<Task[]> {

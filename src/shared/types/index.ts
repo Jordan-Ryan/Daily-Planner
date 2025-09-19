@@ -19,6 +19,13 @@ export interface Theme {
     };
     border: string;
     shadow: string;
+    // Glass morphism colors
+    glass: {
+      background: string;
+      border: string;
+      overlay: string;
+      highlight: string;
+    };
   };
   spacing: {
     xs: number;
@@ -70,6 +77,24 @@ export interface Theme {
       shadowOpacity: number;
       shadowRadius: number;
       elevation: number;
+    };
+  };
+  // Glass morphism effects
+  glass: {
+    blur: {
+      light: number;
+      medium: number;
+      heavy: number;
+    };
+    opacity: {
+      light: number;
+      medium: number;
+      heavy: number;
+    };
+    backdrop: {
+      light: string;
+      medium: string;
+      heavy: string;
     };
   };
 }

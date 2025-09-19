@@ -23,6 +23,8 @@ export interface Task {
   isRecurring?: boolean;
   isSystemTask?: boolean;
   isAllDay?: boolean; // For tasks that span the entire day
+  isDirectOverlap?: boolean; // For events that directly overlap (same time)
+  overlapGroup?: string; // Groups events that directly overlap
 }
 
 export interface TimelineEvent {

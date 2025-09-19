@@ -19,6 +19,13 @@ export const lightTheme: Theme = {
     },
     border: '#E5E5EA',
     shadow: '#000000',
+    // Glass morphism colors for light theme
+    glass: {
+      background: 'rgba(255, 255, 255, 0.25)',
+      border: 'rgba(255, 255, 255, 0.18)',
+      overlay: 'rgba(255, 255, 255, 0.1)',
+      highlight: 'rgba(255, 255, 255, 0.4)',
+    },
   },
   spacing: {
     xs: 4,
@@ -72,6 +79,24 @@ export const lightTheme: Theme = {
       elevation: 4,
     },
   },
+  // Glass morphism effects for light theme
+  glass: {
+    blur: {
+      light: 10,
+      medium: 20,
+      heavy: 30,
+    },
+    opacity: {
+      light: 0.1,
+      medium: 0.2,
+      heavy: 0.3,
+    },
+    backdrop: {
+      light: 'rgba(255, 255, 255, 0.1)',
+      medium: 'rgba(255, 255, 255, 0.2)',
+      heavy: 'rgba(255, 255, 255, 0.3)',
+    },
+  },
 };
 
 export const darkTheme: Theme = {
@@ -93,6 +118,13 @@ export const darkTheme: Theme = {
     },
     border: '#38383A',
     shadow: '#000000',
+    // Glass morphism colors for dark theme
+    glass: {
+      background: 'rgba(28, 28, 30, 0.4)',
+      border: 'rgba(255, 255, 255, 0.1)',
+      overlay: 'rgba(0, 0, 0, 0.2)',
+      highlight: 'rgba(255, 255, 255, 0.05)',
+    },
   },
   spacing: {
     xs: 4,
@@ -144,6 +176,24 @@ export const darkTheme: Theme = {
       shadowOpacity: 0.4,
       shadowRadius: 4,
       elevation: 4,
+    },
+  },
+  // Glass morphism effects for dark theme
+  glass: {
+    blur: {
+      light: 10,
+      medium: 20,
+      heavy: 30,
+    },
+    opacity: {
+      light: 0.1,
+      medium: 0.2,
+      heavy: 0.3,
+    },
+    backdrop: {
+      light: 'rgba(0, 0, 0, 0.2)',
+      medium: 'rgba(0, 0, 0, 0.3)',
+      heavy: 'rgba(0, 0, 0, 0.4)',
     },
   },
 };

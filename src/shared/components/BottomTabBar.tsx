@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Text, ScrollView } from 'react-native';
 import { Theme, TabType } from '../types';
+import { GlassEffect } from './GlassEffect';
 
 interface BottomTabBarProps {
   theme: Theme;
@@ -60,7 +61,12 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
 
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
-      <View style={[styles.tabGroup, { backgroundColor: theme.colors.surface }]}>
+      <GlassEffect
+        theme={theme}
+        intensity="medium"
+        borderRadius={20}
+        style={styles.tabGroup}
+      >
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -77,15 +83,22 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
             </TouchableOpacity>
           ))}
         </ScrollView>
-      </View>
+      </GlassEffect>
 
       <View style={styles.addButtonContainer}>
-        <TouchableOpacity
+        <GlassEffect
+          theme={theme}
+          intensity="heavy"
+          borderRadius={28}
           style={styles.addButton}
-          onPress={handleAddButtonPress}
         >
-          <Text style={styles.addButtonIcon}>+</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.addButtonTouchable}
+            onPress={handleAddButtonPress}
+          >
+            <Text style={styles.addButtonIcon}>+</Text>
+          </TouchableOpacity>
+        </GlassEffect>
       </View>
     </View>
   );
@@ -103,18 +116,9 @@ const styles = StyleSheet.create({
   },
   tabGroup: {
     flex: 1,
-    borderRadius: 20,
     paddingVertical: 8,
     paddingHorizontal: 12,
     marginRight: 80, // Add space for the plus button
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
     overflow: 'hidden', // Ensure content doesn't overflow the rounded container
   },
   scrollContent: {
@@ -146,20 +150,14 @@ const styles = StyleSheet.create({
   addButton: {
     width: 56,
     height: 56,
-    borderRadius: 28,
-    backgroundColor: '#FFFFFF',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  addButtonTouchable: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   addButtonIcon: {
     fontSize: 24,

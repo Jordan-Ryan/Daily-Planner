@@ -46,7 +46,7 @@ export const HealthView: React.FC<HealthViewProps> = ({ theme }) => {
       
       <ScrollView 
         style={styles.scrollView}
-        contentContainerStyle={[styles.scrollContent, { paddingTop: Platform.OS === 'ios' ? 44 : 20 }]}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: 0 }]}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>

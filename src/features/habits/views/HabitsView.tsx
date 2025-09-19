@@ -7,6 +7,7 @@ import { useHabits } from '../hooks/useHabits';
 import { MetricCard } from '../../../shared/components/MetricCard';
 import { HealthRoutingModal } from '../components/HealthRoutingModal';
 import { TimerOverlay } from '../components/TimerOverlay';
+import { GlassButton } from '../../../shared/components/GlassButton';
 
 interface HabitsViewProps {
   theme: Theme;
@@ -123,7 +124,7 @@ export const HabitsView: React.FC<HabitsViewProps> = ({ theme }) => {
       
       <ScrollView 
         style={styles.scrollView}
-        contentContainerStyle={[styles.scrollContent, { paddingTop: Platform.OS === 'ios' ? 44 : 20 }]}
+        contentContainerStyle={[styles.scrollContent, { paddingTop: 0 }]}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
@@ -134,32 +135,49 @@ export const HabitsView: React.FC<HabitsViewProps> = ({ theme }) => {
         </View>
 
         {/* Filter buttons */}
-        <View style={styles.filterContainer}>
-          <TouchableOpacity
-            style={getFilterButtonStyle('all')}
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.filterScrollContent}
+          style={styles.filterScrollContainer}
+        >
+          <GlassButton
+            title="All"
             onPress={() => setFilter('all')}
-          >
-            <Text style={getFilterTextStyle('all')}>All</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={getFilterButtonStyle('dueToday')}
+            theme={theme}
+            variant={filter === 'all' ? 'primary' : 'secondary'}
+            size="small"
+            intensity="light"
+            style={[styles.filterButton, { paddingHorizontal: 6, marginRight: -2 }]}
+          />
+          <GlassButton
+            title="Due Today"
             onPress={() => setFilter('dueToday')}
-          >
-            <Text style={getFilterTextStyle('dueToday')}>Due Today</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={getFilterButtonStyle('timed')}
+            theme={theme}
+            variant={filter === 'dueToday' ? 'primary' : 'secondary'}
+            size="small"
+            intensity="light"
+            style={[styles.filterButton, { paddingHorizontal: 6, marginRight: -2 }]}
+          />
+          <GlassButton
+            title="Timed"
             onPress={() => setFilter('timed')}
-          >
-            <Text style={getFilterTextStyle('timed')}>Timed</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={getFilterButtonStyle('negative')}
+            theme={theme}
+            variant={filter === 'timed' ? 'primary' : 'secondary'}
+            size="small"
+            intensity="light"
+            style={[styles.filterButton, { paddingHorizontal: 6, marginRight: -2 }]}
+          />
+          <GlassButton
+            title="Negative"
             onPress={() => setFilter('negative')}
-          >
-            <Text style={getFilterTextStyle('negative')}>Negative</Text>
-          </TouchableOpacity>
-        </View>
+            theme={theme}
+            variant={filter === 'negative' ? 'primary' : 'secondary'}
+            size="small"
+            intensity="light"
+            style={[styles.filterButton, { paddingHorizontal: 6 }]}
+          />
+        </ScrollView>
 
         {/* Due Today Section */}
         {dueToday.length > 0 && (

@@ -42,17 +42,22 @@ export const HabitsStyles = (theme: Theme) => StyleSheet.create({
     marginHorizontal: 20,
     marginBottom: 12,
   },
-  filterContainer: {
+  filterScrollContainer: {
+    marginBottom: 20,
+  },
+  filterScrollContent: {
     flexDirection: 'row',
     paddingHorizontal: 20,
-    marginBottom: 20,
-    gap: 8,
+    gap: 0,
+    paddingRight: 20, // Extra padding to ensure last button is fully visible
   },
   filterButton: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 8,
     paddingVertical: 8,
     borderRadius: 20,
     borderWidth: 1,
+    marginHorizontal: 0,
+    marginVertical: 0,
   },
   filterText: {
     fontSize: 14,

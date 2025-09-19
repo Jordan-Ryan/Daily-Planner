@@ -1,14 +1,15 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { Theme } from '../../../shared/types';
 
 interface HeaderProps {
   theme: Theme;
   selectedDate: Date;
   onCalendarPress: () => void;
+  noTopPadding?: boolean;
 }
 
-export const Header: React.FC<HeaderProps> = ({ theme, selectedDate, onCalendarPress }) => {
+export const Header: React.FC<HeaderProps> = ({ theme, selectedDate, onCalendarPress, noTopPadding = false }) => {
   const formatDate = (date: Date): string => {
     return date.toLocaleDateString('en-US', { 
       day: 'numeric', 
@@ -18,7 +19,11 @@ export const Header: React.FC<HeaderProps> = ({ theme, selectedDate, onCalendarP
   };
 
   return (
-    <View style={[styles.header, { backgroundColor: theme.colors.background }]}>
+    <View style={[styles.header, { 
+      backgroundColor: theme.colors.background,
+      paddingTop: noTopPadding ? 0 : 16,
+      paddingBottom: 16
+    }]}>
       <View style={styles.dateContainer}>
         <Text style={[styles.dateTitle, { color: theme.colors.text.primary }]}>
           {formatDate(selectedDate)}
@@ -37,7 +42,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 20,
-    paddingVertical: 16,
     minHeight: 60,
   },
   dateContainer: {

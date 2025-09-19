@@ -69,7 +69,7 @@ export const InboxView: React.FC<InboxViewProps> = ({
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <StatusBar style="light" translucent={false} />
       
-      <View style={[styles.header, { paddingTop: Platform.OS === 'ios' ? 44 : 20 }]}>
+      <View style={[styles.header, { paddingTop: 0 }]}>
         <Text style={[styles.headerTitle, { color: theme.colors.text.primary }]}>
           Inbox
         </Text>

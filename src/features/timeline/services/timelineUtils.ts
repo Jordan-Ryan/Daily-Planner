@@ -81,7 +81,11 @@ export const getEventColor = (calendar: string): string => {
   }
 };
 
-export const getEventBackgroundColor = (calendar: string): string => {
+export const getEventBackgroundColor = (calendar: string, isOverlapping?: boolean): string => {
+  if (isOverlapping) {
+    return 'transparent';
+  }
+  
   switch (calendar) {
     case 'Personal': return '#2A2A2A';
     case 'Work': return '#2A2A2A';
@@ -141,4 +145,142 @@ export const formatTimeDisplay = (startTime: string, endTime: string): string =>
     return startTime;
   }
   return `${startTime}-${endTime}`;
+};
+
+/**
+ * Detects overlapping events and marks them accordingly
+ * @param tasks Array of tasks to check for overlaps
+ * @returns Array of tasks with isOverlapping property set
+ */
+export const detectOverlappingEvents = (tasks: Task[]): Task[] => {
+  const tasksWithOverlaps = tasks.map(task => ({ ...task, isOverlapping: false }));
+  
+  // Sort tasks by start time for easier comparison
+  const sortedTasks = tasksWithOverlaps.sort((a, b) => {
+    const timeA = a.startTime.split(':').map(Number);
+    const timeB = b.startTime.split(':').map(Number);
+    return (timeA[0] * 60 + timeA[1]) - (timeB[0] * 60 + timeB[1]);
+  });
+  
+  // Check each task against all subsequent tasks for overlaps
+  for (let i = 0; i < sortedTasks.length; i++) {
+    const currentTask = sortedTasks[i];
+    const currentStart = timeToMinutes(currentTask.startTime);
+    const currentEnd = timeToMinutes(currentTask.endTime);
+    
+    for (let j = i + 1; j < sortedTasks.length; j++) {
+      const otherTask = sortedTasks[j];
+      const otherStart = timeToMinutes(otherTask.startTime);
+      const otherEnd = timeToMinutes(otherTask.endTime);
+      
+      // Check if tasks overlap (not just touching)
+      if (currentEnd > otherStart && currentStart < otherEnd) {
+        currentTask.isOverlapping = true;
+        otherTask.isOverlapping = true;
+      }
+    }
+  }
+  
+  return sortedTasks;
+};
+
+/**
+ * Groups overlapping events into overlap groups for switching
+ * Groups events that share the same middle half-hour slot
+ * @param tasks Array of tasks to group
+ * @returns Map of overlap groups
+ */
+export const groupOverlappingEvents = (tasks: Task[]): Map<string, Task[]> => {
+  const overlapGroups = new Map<string, Task[]>();
+  const processedTasks = new Set<string>();
+  
+  // For each task, find all other tasks that have overlapping middle half-hour periods
+  tasks.forEach((task, index) => {
+    if (processedTasks.has(task.id)) return;
+    
+    const startMinutes = timeToMinutes(task.startTime);
+    const endMinutes = timeToMinutes(task.endTime);
+    const middleMinutes = (startMinutes + endMinutes) / 2;
+    
+    // Calculate the middle half-hour period (30 minutes centered around the middle)
+    const middleHalfHourStart = middleMinutes - 15; // 15 minutes before middle
+    const middleHalfHourEnd = middleMinutes + 15;   // 15 minutes after middle
+    
+    const groupKey = `overlap-${index}`;
+    const groupTasks: Task[] = [task];
+    processedTasks.add(task.id);
+    
+    // Find all other tasks that overlap with this task's middle half-hour period
+    tasks.forEach(otherTask => {
+      if (otherTask.id === task.id || processedTasks.has(otherTask.id)) return;
+      
+      const otherStartMinutes = timeToMinutes(otherTask.startTime);
+      const otherEndMinutes = timeToMinutes(otherTask.endTime);
+      const otherMiddleMinutes = (otherStartMinutes + otherEndMinutes) / 2;
+      
+      // Calculate the other task's middle half-hour period
+      const otherMiddleHalfHourStart = otherMiddleMinutes - 15;
+      const otherMiddleHalfHourEnd = otherMiddleMinutes + 15;
+      
+      // Check if the middle half-hour periods overlap
+      const overlap = !(middleHalfHourEnd <= otherMiddleHalfHourStart || otherMiddleHalfHourEnd <= middleHalfHourStart);
+      
+      if (overlap) {
+        groupTasks.push(otherTask);
+        processedTasks.add(otherTask.id);
+      }
+    });
+    
+    // Only create a group if there are multiple tasks
+    if (groupTasks.length > 1) {
+      overlapGroups.set(groupKey, groupTasks);
+    }
+  });
+  
+  return overlapGroups;
+};
+
+/**
+ * Converts time string (HH:MM) to minutes since midnight
+ * @param timeString Time in HH:MM format
+ * @returns Minutes since midnight
+ */
+const timeToMinutes = (timeString: string): number => {
+  const [hours, minutes] = timeString.split(':').map(Number);
+  return hours * 60 + minutes;
+};
+
+/**
+ * Detects if a task's top or bottom border overlaps with other tasks
+ * @param task The task to check
+ * @param allTasks All tasks in the timeline
+ * @returns Object with topBorderOverlap and bottomBorderOverlap flags
+ */
+export const detectBorderOverlaps = (task: Task, allTasks: Task[]): { topBorderOverlap: boolean; bottomBorderOverlap: boolean } => {
+  const taskStartMinutes = timeToMinutes(task.startTime);
+  const taskEndMinutes = timeToMinutes(task.endTime);
+  
+  let topBorderOverlap = false;
+  let bottomBorderOverlap = false;
+  
+  allTasks.forEach(otherTask => {
+    if (otherTask.id === task.id) return;
+    
+    const otherStartMinutes = timeToMinutes(otherTask.startTime);
+    const otherEndMinutes = timeToMinutes(otherTask.endTime);
+    
+    // Check if top border (start time) overlaps with any other task's time range
+    // Exclude exact matches (touching events)
+    if (taskStartMinutes > otherStartMinutes && taskStartMinutes < otherEndMinutes) {
+      topBorderOverlap = true;
+    }
+    
+    // Check if bottom border (end time) overlaps with any other task's time range
+    // Exclude exact matches (touching events)
+    if (taskEndMinutes > otherStartMinutes && taskEndMinutes < otherEndMinutes) {
+      bottomBorderOverlap = true;
+    }
+  });
+  
+  return { topBorderOverlap, bottomBorderOverlap };
 };

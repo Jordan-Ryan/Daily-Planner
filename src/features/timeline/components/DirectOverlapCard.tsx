@@ -1,41 +1,55 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Task } from '../types';
 import { Theme } from '../../../shared/types';
 import { getEventColor, getEventBackgroundColor, getEventBorderColor, getEventHeight, getEventTopPosition, formatTimeDisplay, detectBorderOverlaps } from '../services/timelineUtils';
 
-interface TaskCardProps {
-  task: Task;
+interface DirectOverlapCardProps {
+  tasks: Task[]; // All tasks in the overlap group
+  allTasks: Task[]; // All tasks in the timeline for border overlap detection
   theme: Theme;
-  tasks: Task[];
   onToggleComplete: (taskId: string) => void;
   onEditTask: (task: Task) => void;
 }
 
-export const TaskCard: React.FC<TaskCardProps> = ({ task, theme, tasks, onToggleComplete, onEditTask }) => {
-  const topPosition = getEventTopPosition(task, tasks);
-  const height = getEventHeight(task);
-  const borderOverlaps = detectBorderOverlaps(task, tasks);
+export const DirectOverlapCard: React.FC<DirectOverlapCardProps> = ({ 
+  tasks, 
+  allTasks,
+  theme, 
+  onToggleComplete, 
+  onEditTask 
+}) => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const currentTask = tasks[currentIndex];
+  const height = getEventHeight(currentTask);
+  const topPosition = getEventTopPosition(currentTask, allTasks);
+  const borderOverlaps = detectBorderOverlaps(currentTask, allTasks);
+
+  const handlePrevious = () => {
+    setCurrentIndex((prev) => (prev > 0 ? prev - 1 : tasks.length - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev < tasks.length - 1 ? prev + 1 : 0));
+  };
 
   return (
-    <TouchableOpacity 
+    <View 
       style={[
-        styles.taskContainer,
+        styles.container,
         {
           top: topPosition,
           height: height,
         }
       ]}
-      onPress={() => onEditTask(task)}
-      activeOpacity={0.7}
     >
       <View style={styles.taskRow}>
         <View
           style={[
             styles.taskBar,
             {
-              backgroundColor: getEventBackgroundColor(task.calendar, task.isOverlapping),
-              borderColor: getEventBorderColor(task.calendar),
+              backgroundColor: getEventBackgroundColor(currentTask.calendar, true),
+              borderColor: getEventBorderColor(currentTask.calendar),
               height: height,
               borderTopWidth: borderOverlaps.topBorderOverlap ? 0 : 2,
               borderBottomWidth: borderOverlaps.bottomBorderOverlap ? 0 : 2,
@@ -45,48 +59,76 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task, theme, tasks, onToggle
           ]}
         >
           <View style={styles.taskIconInBar}>
-            <Text style={{ fontSize: 14, color: getEventColor(task.calendar) }}>
-              {task.icon}
+            <Text style={{ fontSize: 14, color: getEventColor(currentTask.calendar) }}>
+              {currentTask.icon}
             </Text>
           </View>
         </View>
+        
         <View style={styles.taskDetails}>
           <Text style={[styles.taskTitle, { color: theme.colors.text.primary }]}>
-            {task.title}
+            {currentTask.title}
           </Text>
           <Text style={[styles.taskTime, { color: theme.colors.text.secondary }]}>
-            {formatTimeDisplay(task.startTime, task.endTime)}
+            {formatTimeDisplay(currentTask.startTime, currentTask.endTime)}
           </Text>
-          <Text style={[styles.taskCalendar, { color: getEventColor(task.calendar) }]}>
-            {task.calendar}
+          <Text style={[styles.taskCalendar, { color: getEventColor(currentTask.calendar) }]}>
+            {currentTask.calendar}
           </Text>
         </View>
+
+        <View style={styles.controlsContainer}>
+          <TouchableOpacity 
+            style={styles.arrowButton} 
+            onPress={handlePrevious}
+            disabled={tasks.length <= 1}
+          >
+            <Text style={[styles.arrowText, { color: theme.colors.text.tertiary }]}>
+              ↑
+            </Text>
+          </TouchableOpacity>
+          
+          <Text style={[styles.counterText, { color: theme.colors.text.tertiary }]}>
+            {currentIndex + 1}/{tasks.length}
+          </Text>
+          
+          <TouchableOpacity 
+            style={styles.arrowButton} 
+            onPress={handleNext}
+            disabled={tasks.length <= 1}
+          >
+            <Text style={[styles.arrowText, { color: theme.colors.text.tertiary }]}>
+              ↓
+            </Text>
+          </TouchableOpacity>
+        </View>
+
         <TouchableOpacity 
           style={styles.taskCheckbox} 
           onPress={(e) => {
             e.stopPropagation();
-            onToggleComplete(task.id);
+            onToggleComplete(currentTask.id);
           }}
         >
           <View style={[
             styles.checkbox,
             {
-              borderColor: getEventBorderColor(task.calendar),
-              backgroundColor: task.complete ? getEventBorderColor(task.calendar) : 'transparent'
+              borderColor: getEventBorderColor(currentTask.calendar),
+              backgroundColor: currentTask.complete ? getEventBorderColor(currentTask.calendar) : 'transparent'
             }
           ]}>
-            {task.complete && (
+            {currentTask.complete && (
               <Text style={{ fontSize: 12, color: '#000000' }}>✓</Text>
             )}
           </View>
         </TouchableOpacity>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  taskContainer: {
+  container: {
     position: 'absolute',
     left: 0,
     right: 0,
@@ -140,6 +182,24 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontWeight: '500',
     marginTop: 2,
+  },
+  controlsContainer: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginRight: 8,
+  },
+  arrowButton: {
+    padding: 4,
+    marginVertical: 2,
+  },
+  arrowText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  counterText: {
+    fontSize: 10,
+    fontWeight: '500',
+    marginVertical: 2,
   },
   taskCheckbox: {
     paddingLeft: 8,

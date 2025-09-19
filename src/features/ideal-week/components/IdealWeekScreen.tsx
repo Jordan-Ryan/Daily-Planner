@@ -30,7 +30,7 @@ export const IdealWeekScreen: React.FC<IdealWeekScreenProps> = ({ onDateChange }
   return (
     <View style={[styles.container, { backgroundColor: theme.colors.background }]}>
       <StatusBar style="light" translucent={false} />
-      <View style={[styles.content, { paddingTop: Platform.OS === 'ios' ? 44 : 20 }]}>
+      <View style={[styles.content, { paddingTop: 0 }]}>
         <Header theme={theme} />
         
         <DayStrip
